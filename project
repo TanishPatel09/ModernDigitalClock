@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Digital Clock</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a3c, #2a415e);
+            margin: 0;
+            font-family: 'Roboto Mono', monospace;
+            color: #e0e0e0;
+        }
+
+        nav {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            padding: 15px 0;
+            text-align: center;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav li {
+            display: inline;
+            margin: 0 20px;
+        }
+
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #64b5f6;
+        }
+
+        .clock-container, .settings-container, .about-container, .clock-faces-container {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 50px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .clock-container {
+            display: block;
+        }
+
+        .time {
+            font-size: 4em;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            margin-bottom: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .date {
+            font-size: 1.4em;
+            opacity: 0.8;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .time, .date {
+            transition: text-shadow 0.4s ease;
+        }
+
+        .time:hover, .date:hover {
+            text-shadow: 0 0 8px #64b5f6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-15px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button, select {
+            padding: 10px 15px;
+            border: 1px solid #42a5f5;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            width: 200px;
+        }
+
+        button:hover, select:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: #64b5f6;
+        }
+
+        footer {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            text-align: center;
+            padding: 20px 0;
+            width: 100%;
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
+            margin-top: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        footer a {
+            color: #64b5f6;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            color: #81d4fa;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        .clock-faces {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .clock-face {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #64b5f6;
+        }
+        .settings-container .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .settings-container label {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#" data-page="clock">Clock</a></li>
+            <li><a href="#" data-page="clock-faces">Clock Faces</a></li>
+            <li><a href="#" data-page="settings">Settings</a></li>
+        </ul>
+    </nav>
+    <div class="clock-container">
+        <div class="clock">
+            <div class="time" id="time"></div>
+            <div class="date" id="date"></div>
+            <div class="controls">
+                <select id="timezone">
+                    <option value="default">Local Time</option>
+                    <optgroup label="North America">
+                        <option value="America/New_York">New York, USA</option>
+                        <option value="America/Chicago">Chicago, USA</option>
+                        <option value="America/Los_Angeles">Los Angeles, USA</option>
+                        <option value="America/Toronto">Toronto, Canada</option>
+                        <option value="America/Mexico_City">Mexico City, Mexico</option>
+                    </optgroup>
+                    <optgroup label="Europe">
+                        <option value="Europe/London">London, UK</option>
+                        <option value="Europe/Paris">Paris, France</option>
+                        <option value="Europe/Berlin">Berlin, Germany</option>
+                        <option value="Europe/Moscow">Moscow, Russia</option>
+                        <option value="Europe/Rome">Rome, Italy</option>
+                    </optgroup>
+                    <optgroup label="Asia">
+                        <option value="Asia/Tokyo">Tokyo, Japan</option>
+                        <option value="Asia/Shanghai">Shanghai, China</option>
+                        <option value="Asia/Kolkata">Kolkata, India</option>
+                        <option value="Asia/Dubai">Dubai, UAE</option>
+                        <option value="Asia/Seoul">Seoul, South Korea</option>
+                    </optgroup>
+                    <optgroup label="Australia/Oceania">
+                        <option value="Australia/Sydney">Sydney, Australia</option>
+                        <option value="Pacific/Auckland">Auckland, New Zealand</option>
+                    </optgroup>
+                    <optgroup label="Africa">
+                        <option value="Africa/Cairo">Cairo, Egypt</option>
+                        <option value="Africa/Johannesburg">Johannesburg, South Africa</option>
+                    </optgroup>
+                    <option value="UTC">UTC</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="clock-faces-container">
+        <div class="clock-faces" id="clockFaces"></div>
+    </div>
+    <div class="settings-container">
+        <h2>Clock Settings</h2>
+        <div class="setting-item">
+            <label for="timeFormat">Time Format:</label>
+            <select id="timeFormat">
+                <option value="12">12-Hour</option>
+                <option value="24">24-Hour</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label for="showSeconds">Show Seconds:</label>
+            <input type="checkbox" id="showSeconds">
+        </div>
+        <div class="setting-item">
+            <label for="clockFont">Font:</label>
+            <select id="clockFont">
+                <option value="Roboto Mono">Roboto Mono</option>
+                <option value="monospace">Monospace</option>
+                <option value="sans-serif">Sans-Serif</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label for="clockFontSize">Font Size:</label>
+            <input type="number" id="clockFontSize" value="4">
+        </div>
+        <div class="setting-item">
+            <label for="clockOpacity">Opacity</label>
+            <input type="range" id="clockOpacity" min="0.1" max="1" step="0.1" value="1">
+        </div>
+        <div class="setting-item">
+            <label for="dateFormat">Date Format:</label>
+            <select id="dateFormat">
+                <option value="short">Short (MM/DD/YYYY)</option>
+                <option value="medium">Medium (MMM DD, YYYY)</option>
+                <option value="long">Long (MMMM DD, YYYY)</option>
+                <option value="full">Full (Weekday, MMMM DD, YYYY)</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <button id="resetSettings">Reset Settings</button>
+        </div>
+    </div>
+    <footer>
+        <p>| Digital Clock |</p>
+    </footer>
+    <script>
+        let currentClockFace = '#FFFFFF';
+
+        function updateClock() {
+            const now = new Date();
+            const time = document.getElementById('time');
+            const date = document.getElementById('date');
+            const timezoneSelect = document.getElementById('timezone');
+            const timeFormatSelect = document.getElementById('timeFormat');
+            const showSecondsCheckbox = document.getElementById('showSeconds');
+            const fontSelect = document.getElementById('clockFont');
+            const fontSizeInput = document.getElementById('clockFontSize');
+            const opacityInput = document.getElementById('clockOpacity');
+            const dateFormatSelect = document.getElementById('dateFormat');
+
+            const timezone = timezoneSelect.value === 'default' ? Intl.DateTimeFormat().resolvedOptions().timeZone : timezoneSelect.value;
+
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: showSecondsCheckbox.checked ? '2-digit' : undefined,
+                hour12: timeFormatSelect.value === '12',
+                timeZone: timezone,
+                hourCycle: timeFormatSelect.value === '24' ? 'h23' : 'h12'
+            };
+
+            let timeString = new Intl.DateTimeFormat('en-US', timeOptions).format(now);
+
+            const dateOptions = {
+                weekday: dateFormatSelect.value === 'full' ? 'long' : undefined,
+                month: dateFormatSelect.value === 'short' ? '2-digit' : dateFormatSelect.value === 'medium' ? 'short' : 'long',
+                day: 'numeric',
+                year: 'numeric',
+                timeZone: timezone,
+            };
+
+            const dateString = new Intl.DateTimeFormat('en-US', dateOptions).format(now);
+
+            time.textContent = timeString;
+            date.textContent = dateString;
+            time.style.color = currentClockFace;
+            date.style.color = currentClockFace;
+            time.style.fontFamily = fontSelect.value;
+            time.style.fontSize = fontSizeInput.value + "em";
+            time.style.opacity = opacityInput.value;
+            date.style.fontFamily = fontSelect.value;
+            date.style.opacity = opacityInput.value;
+        }
+
+        document.getElementById('timezone').addEventListener('change', updateClock);
+
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.dataset.page;
+                document.querySelectorAll('.clock-container, .settings-container, .about-container, .clock-faces-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                document.querySelector(`.${page}-container`).style.display = 'block';
+                if (page === 'clock-faces') {
+                    generateClockFaces();
+                }
+            });
+        });
+
+        function generateClockFaces() {
+            const clockFaces = document.getElementById('clockFaces');
+            clockFaces.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                const face = document.createElement('div');
+                face.classList.add('clock-face');
+                face.style.backgroundColor = color;
+                face.addEventListener('click', function() {
+                    currentClockFace = color;
+                    updateClock();
+                    document.querySelector('.clock-container').style.display = 'block';
+                    document.querySelector('.clock-faces-container').style.display = 'none';
+                });
+                clockFaces.appendChild(face);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const timeFormatSelect = document.getElementById('timeFormat');
+            const showSecondsCheckbox = document.getElementById('showSeconds');
+            const fontSelect = document.getElementById('clockFont');
+            const fontSizeInput = document.getElementById('clockFontSize');
+            const opacityInput = document.getElementById('clockOpacity');
+            const resetSettingsButton = document.getElementById('resetSettings');
+            const dateFormatSelect = document.getElementById('dateFormat');
+
+            const savedTimeFormat = localStorage.getItem('timeFormat') || '12';
+            const savedShowSeconds = localStorage.getItem('showSeconds') === 'true';
+            const savedFont = localStorage.getItem('clockFont') || "Roboto Mono";
+            const savedFontSize = localStorage.getItem('clockFontSize') || 4;
+            const savedOpacity = localStorage.getItem('clockOpacity') || 1;
+            const savedDateFormat = localStorage.getItem('dateFormat') || 'short';
+
+            timeFormatSelect.value = savedTimeFormat;
+            showSecondsCheckbox.checked = savedShowSeconds;
+            fontSelect.value = savedFont;
+            fontSizeInput.value = savedFontSize;
+            opacityInput.value = savedOpacity;
+            dateFormatSelect.value = savedDateFormat;
+
+            timeFormatSelect.addEventListener('change', () => {
+                localStorage.setItem('timeFormat', timeFormatSelect.value);
+                updateClock();
+            });
+
+            showSecondsCheckbox.addEventListener('change', () => {
+                localStorage.setItem('showSeconds', showSecondsCheckbox.checked);
+                updateClock();
+            });
+
+            fontSelect.addEventListener('change', () => {
+                localStorage.setItem('clockFont', fontSelect.value);
+                updateClock();
+            });
+
+            fontSizeInput.addEventListener('change', () => {
+                localStorage.setItem('clockFontSize', fontSizeInput.value);
+                updateClock();
+            });
+
+            opacityInput.addEventListener('change', () => {
+                localStorage.setItem('clockOpacity', opacityInput.value);
+                updateClock();
+            });
+
+            dateFormatSelect.addEventListener('change', () => {
+                localStorage.setItem('dateFormat', dateFormatSelect.value);
+                updateClock();
+            });
+
+            resetSettingsButton.addEventListener('click', () => {
+                localStorage.clear();
+                location.reload();
+            });
+        });
+
+    </script>
+</body>
+</html>
